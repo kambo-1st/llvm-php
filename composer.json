@@ -26,5 +26,8 @@
     "psr-4": {
       "Kambo\\Tests\\LLVM\\": "tests/"
     }
+  },
+  "scripts": {
+    "test": "./vendor/bin/phpunit"
   }
 }
