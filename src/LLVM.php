@@ -10,6 +10,7 @@ use Kambo\LLVM\Types\LLVMGenericValueRef;
 use Kambo\LLVM\Types\LLVMModuleRef;
 use Kambo\LLVM\Types\LLVMTypeRef;
 use Kambo\LLVM\Types\LLVMValueRef;
+use Kambo\LLVM\Types\Marshable;
 
 /**
  * Simple wrapper around LLVM c api
@@ -295,12 +296,12 @@ unsigned long long LLVMGenericValueToInt(LLVMGenericValueRef GenValRef, LLVMBool
         return $this->ffi->LLVMGenericValueToInt($this->unwrap($genValRef), $isSigned);
     }
 
-    private function wrap(string $type, $item)
+    private function wrap(string $type, $item) : Marshable
     {
         return $type::marshal($item);
     }
 
-    private function unwrap($item)
+    private function unwrap(Marshable $item)
     {
         return $item->demarshal($this->ffi);
     }
