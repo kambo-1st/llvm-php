@@ -3,12 +3,12 @@
 namespace Kambo\LLVM\Types;
 
 /**
- * Class LLVMBasicBlockRef
+ * Represents a basic block of instructions in LLVM IR.
  *
- * Lorem ipsum dolor
+ * This models llvm::BasicBlock.
  *
  * @author  Bohuslav Simek <bohuslav@simek.si>
- * @license MIT
+ * @license BSD
  */
 class LLVMBasicBlockRef extends BaseRef
 {

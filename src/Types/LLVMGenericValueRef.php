@@ -8,7 +8,7 @@ namespace Kambo\LLVM\Types;
  * Lorem ipsum dolor
  *
  * @author  Bohuslav Simek <bohuslav@simek.si>
- * @license MIT
+ * @license BSD
  */
 class LLVMGenericValueRef extends BaseRef
 {

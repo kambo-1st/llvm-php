@@ -3,12 +3,10 @@
 namespace Kambo\LLVM\Types;
 
 /**
- * Class LLVMTypeRef
- *
- * Lorem ipsum dolor
+ * Each value in the LLVM IR has a type, an LLVMTypeRef.
  *
  * @author  Bohuslav Simek <bohuslav@simek.si>
- * @license MIT
+ * @license BSD
  */
 class LLVMTypeRef extends BaseRef
 {

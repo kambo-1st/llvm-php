@@ -3,12 +3,10 @@
 namespace Kambo\LLVM\Types;
 
 /**
- * Class LLVMValueRef
- *
- * Lorem ipsum dolor
+ * Represents an individual value in LLVM IR.
  *
  * @author  Bohuslav Simek <bohuslav@simek.si>
- * @license MIT
+ * @license BSD
  */
 class LLVMValueRef extends BaseRef
 {

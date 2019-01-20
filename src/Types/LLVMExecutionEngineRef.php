@@ -10,7 +10,7 @@ use FFI\CData;
  * Lorem ipsum dolor
  *
  * @author  Bohuslav Simek <bohuslav@simek.si>
- * @license MIT
+ * @license BSD
  */
 class LLVMExecutionEngineRef extends BaseRef
 {

@@ -3,12 +3,12 @@
 namespace Kambo\LLVM\Types;
 
 /**
- * Class LLVMBuilderRef
+ * Represents an LLVM basic block builder.
  *
- * Lorem ipsum dolor
+ * This models llvm::IRBuilder.
  *
  * @author  Bohuslav Simek <bohuslav@simek.si>
- * @license MIT
+ * @license BSD
  */
 class LLVMBuilderRef extends BaseRef
 {
