@@ -1,0 +1,30 @@
+{
+  "name": "kambo/llvm-php",
+  "description": "",
+  "license": "BSD",
+  "type": "library",
+  "keywords": [],
+  "authors": [
+    {
+      "name": "Bohuslav Simek",
+      "email": "bohuslav@simek.si"
+    }
+  ],
+  "require": {
+    "php": ">=7.3",
+    "ext-ffi": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "7.*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Kambo\\LLVM\\": "src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Kambo\\Tests\\LLVM\\": "tests/"
+    }
+  }
+}
