@@ -1,14 +1,14 @@
 <?php
 
-namespace Kambo\Tests\LLVM\Intergration;
+namespace Kambo\Tests\LLVM\Integration;
 
 use PHPUnit\Framework\TestCase;
 use Kambo\LLVM\LLVM;
-use Kambo\LLVM\LLVMModuleRef;
-use Kambo\LLVM\LLVMExecutionEngineRef;
+use Kambo\LLVM\Types\LLVMExecutionEngineRef;
+use Kambo\LLVM\Types\LLVMModuleRef;
 
 /**
- * Unit tests for class Kambo\LLVM\LLVM
+ * Integration tests for class Kambo\LLVM\LLVM
  *
  * @author Bohuslav Simek <bohuslav@simek.si>
  */

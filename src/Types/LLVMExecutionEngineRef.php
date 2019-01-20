@@ -1,18 +1,23 @@
 <?php
 
-namespace Kambo\LLVM;
+namespace Kambo\LLVM\Types;
 
 /**
- * Class LLVMModuleRef
+ * Class LLVMExecutionEngineRef
  *
  * Lorem ipsum dolor
  *
  * @author  Bohuslav Simek <bohuslav@simek.si>
  * @license MIT
  */
-class LLVMModuleRef
+class LLVMExecutionEngineRef
 {
     private $ffiStructure;
+
+    public function __construct()
+    {
+
+    }
 
     public static function marshal($ffiStructure)
     {
@@ -22,8 +27,14 @@ class LLVMModuleRef
         return $instance;
     }
 
-    public function demarshal()
+    public function demarshal($ffi=null)
     {
+        // TODO prepare abstraction for this
+        if ($this->ffiStructure === null) {
+            $reflect            = new \ReflectionClass($this);
+            $this->ffiStructure = $ffi->new($reflect->getShortName()." value");
+        }
+
         return $this->ffiStructure;
     }
 

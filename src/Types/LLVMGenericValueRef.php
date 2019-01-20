@@ -1,16 +1,16 @@
 <?php
 
-namespace Kambo\LLVM;
+namespace Kambo\LLVM\Types;
 
 /**
- * Class LLVMBasicBlockRef
+ * Class LLVMGenericValueRef
  *
  * Lorem ipsum dolor
  *
  * @author  Bohuslav Simek <bohuslav@simek.si>
  * @license MIT
  */
-class LLVMBasicBlockRef
+class LLVMGenericValueRef
 {
     private $ffiStructure;
 

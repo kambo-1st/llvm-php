@@ -3,6 +3,13 @@
 namespace Kambo\LLVM;
 
 use FFI;
+use Kambo\LLVM\Types\LLVMBasicBlockRef;
+use Kambo\LLVM\Types\LLVMBuilderRef;
+use Kambo\LLVM\Types\LLVMExecutionEngineRef;
+use Kambo\LLVM\Types\LLVMGenericValueRef;
+use Kambo\LLVM\Types\LLVMModuleRef;
+use Kambo\LLVM\Types\LLVMTypeRef;
+use Kambo\LLVM\Types\LLVMValueRef;
 
 /**
  * Simple wrapper around LLVM c api
