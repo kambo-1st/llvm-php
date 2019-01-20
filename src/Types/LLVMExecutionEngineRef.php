@@ -2,6 +2,8 @@
 
 namespace Kambo\LLVM\Types;
 
+use FFI\CData;
+
 /**
  * Class LLVMExecutionEngineRef
  *
@@ -10,24 +12,9 @@ namespace Kambo\LLVM\Types;
  * @author  Bohuslav Simek <bohuslav@simek.si>
  * @license MIT
  */
-class LLVMExecutionEngineRef
+class LLVMExecutionEngineRef extends BaseRef
 {
-    private $ffiStructure;
-
-    public function __construct()
-    {
-
-    }
-
-    public static function marshal($ffiStructure)
-    {
-        $instance = new self;
-        $instance->ffiStructure = $ffiStructure;
-
-        return $instance;
-    }
-
-    public function demarshal($ffi=null)
+    public function demarshal($ffi=null) : CData
     {
         // TODO prepare abstraction for this
         if ($this->ffiStructure === null) {
@@ -36,10 +23,5 @@ class LLVMExecutionEngineRef
         }
 
         return $this->ffiStructure;
-    }
-
-    function __destruct()
-    {
-        // TODO this starts to be interesting...
     }
 }
