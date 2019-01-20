@@ -233,7 +233,59 @@ unsigned long long LLVMGenericValueToInt(LLVMGenericValueRef GenValRef, LLVMBool
         );
 
         return FFI::string($ffiStructure);
-        //return $this->wrap(LLVMValueRef::class, $ffiStructure);
+    }
+
+    public function LLVMLinkInInterpreter() : void
+    {
+        $this->ffi->LLVMLinkInInterpreter();
+    }
+
+    public function LLVMCreateInterpreterForModule(LLVMExecutionEngineRef $outInterp, LLVMModuleRef $module, $outError)
+    {
+        $unWrap = $this->unwrap($outInterp);
+
+        $enginePointer = FFI::addr($unWrap);
+
+        // TODO this should return LLVMBool
+        $this->ffi->LLVMCreateInterpreterForModule($enginePointer, $this->unwrap($module), $outError);
+    }
+
+    public function LLVMGetNamedFunction(LLVMModuleRef $module, string $name) : LLVMValueRef
+    {
+        $ffiStructure = $this->ffi->LLVMGetNamedFunction($this->unwrap($module), $name);
+
+        return $this->wrap(LLVMValueRef::class, $ffiStructure);
+    }
+
+    public function LLVMCreateGenericValueOfInt(LLVMTypeRef $type, int $number, bool $isSigned) : LLVMValueRef
+    {
+        $ffiStructure = $this->ffi->LLVMCreateGenericValueOfInt($this->unwrap($type), $number, $isSigned);
+
+        return $this->wrap(LLVMValueRef::class, $ffiStructure);
+    }
+
+    public function LLVMRunFunction($executionEngine, $function, $numArgs, $args) : LLVMGenericValueRef
+    {
+        $inputValues = $this->ffi->new("LLVMGenericValueRef args[".$numArgs."]");
+
+        foreach ($args as $pos => $paramType) {
+            // Index must be provided
+            $inputValues[$pos]  = $paramType->demarshal();
+        }
+
+        $ffiStructure = $this->ffi->LLVMRunFunction(
+            $this->unwrap($executionEngine),
+            $this->unwrap($function),
+            $numArgs,
+            $inputValues
+        );
+
+        return $this->wrap(LLVMGenericValueRef::class, $ffiStructure);
+    }
+
+    public function LLVMGenericValueToInt(LLVMGenericValueRef $genValRef, bool $isSigned) : int
+    {
+        return $this->ffi->LLVMGenericValueToInt($this->unwrap($genValRef), $isSigned);
     }
 
     private function wrap(string $type, $item)
@@ -243,6 +295,6 @@ unsigned long long LLVMGenericValueToInt(LLVMGenericValueRef GenValRef, LLVMBool
 
     private function unwrap($item)
     {
-        return $item->demarshal();
+        return $item->demarshal($this->ffi);
     }
 }
