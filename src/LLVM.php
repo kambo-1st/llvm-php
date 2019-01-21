@@ -37,8 +37,12 @@ class LLVM
         return LLVMModuleRef::marshal($ffiStructure);
     }
 
-    public function LLVMFunctionType(LLVMTypeRef $returnType, array $paramTypes, int $paramCount, bool $isVarArg) : LLVMTypeRef
-    {
+    public function LLVMFunctionType(
+        LLVMTypeRef $returnType,
+        array $paramTypes,
+        int $paramCount,
+        bool $isVarArg
+    ) : LLVMTypeRef {
         // TODO sanity check
         // TODO use instead static function FFI::arrayType(FFI\CType $type, array $dims): FFI\CType
         $paramTypesFfi = $this->ffi->new("LLVMTypeRef param_types[".$paramCount."]");
@@ -60,13 +64,15 @@ class LLVM
         return LLVMTypeRef::marshal($ffiStructure);
     }
 
-    public function LLVMAddFunction(LLVMModuleRef $module, string $name, LLVMTypeRef $functionType) : LLVMValueRef {
+    public function LLVMAddFunction(LLVMModuleRef $module, string $name, LLVMTypeRef $functionType) : LLVMValueRef
+    {
         $ffiStructure = $this->ffi->LLVMAddFunction($module->demarshal(), $name, $functionType->demarshal());
 
         return LLVMValueRef::marshal($ffiStructure);
     }
 
-    public function LLVMCreateBuilder() : LLVMBuilderRef {
+    public function LLVMCreateBuilder() : LLVMBuilderRef
+    {
         $ffiStructure = $this->ffi->LLVMCreateBuilder();
 
         return LLVMBuilderRef::marshal($ffiStructure);
@@ -84,8 +90,12 @@ class LLVM
         $this->ffi->LLVMPositionBuilderAtEnd($this->unwrap($builder), $this->unwrap($block));
     }
 
-    public function LLVMBuildAdd(LLVMBuilderRef $builder, LLVMValueRef $LHS, LLVMValueRef $RHS, string $name) : LLVMValueRef
-    {
+    public function LLVMBuildAdd(
+        LLVMBuilderRef $builder,
+        LLVMValueRef $LHS,
+        LLVMValueRef $RHS,
+        string $name
+    ) : LLVMValueRef {
         $ffiStructure = $this->ffi->LLVMBuildAdd(
             $this->unwrap($builder),
             $this->unwrap($LHS),

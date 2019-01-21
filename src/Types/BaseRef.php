@@ -46,7 +46,7 @@ class BaseRef implements Marshable
         return $this->ffiStructure;
     }
 
-    function __destruct()
+    public function __destruct()
     {
         // TODO this starts to be interesting...
     }
