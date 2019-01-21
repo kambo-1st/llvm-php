@@ -14,7 +14,7 @@ use FFI\CData;
  */
 class LLVMExecutionEngineRef extends BaseRef
 {
-    public function demarshal($ffi=null) : CData
+    public function demarshal($ffi = null) : CData
     {
         // TODO prepare abstraction for this
         if ($this->ffiStructure === null) {
