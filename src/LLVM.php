@@ -24,10 +24,9 @@ class LLVM
 
     public function __construct()
     {
-        // Not ideal but suffice for POC
         $this->ffi = FFI::cdef(
             file_get_contents(__DIR__ . '/Headers/llvm.h'),
-            '/usr/lib/llvm-6.0/lib/libLLVM.so'
+            'libLLVM-6.0.so'
         );
     }
 
