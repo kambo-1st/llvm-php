@@ -33,7 +33,8 @@ class LLVM
     public function LLVMModuleCreateWithName(string $moduleName) : LLVMModuleRef
     {
         $ffiStructure = $this->ffi->LLVMModuleCreateWithName($moduleName);
-        return LLVMModuleRef::marshal($ffiStructure);
+
+        return $this->wrap(LLVMModuleRef::class, $ffiStructure);
     }
 
     public function LLVMFunctionType(
@@ -53,35 +54,35 @@ class LLVM
 
         $ffiStructure = $this->ffi->LLVMFunctionType($returnType->demarshal(), $paramTypesFfi, $paramCount, $isVarArg);
 
-        return LLVMTypeRef::marshal($ffiStructure);
+        return $this->wrap(LLVMTypeRef::class, $ffiStructure);
     }
 
     public function LLVMInt32Type() : LLVMTypeRef
     {
         $ffiStructure = $this->ffi->LLVMInt32Type();
 
-        return LLVMTypeRef::marshal($ffiStructure);
+        return $this->wrap(LLVMTypeRef::class, $ffiStructure);
     }
 
     public function LLVMAddFunction(LLVMModuleRef $module, string $name, LLVMTypeRef $functionType) : LLVMValueRef
     {
         $ffiStructure = $this->ffi->LLVMAddFunction($module->demarshal(), $name, $functionType->demarshal());
 
-        return LLVMValueRef::marshal($ffiStructure);
+        return $this->wrap(LLVMValueRef::class, $ffiStructure);
     }
 
     public function LLVMCreateBuilder() : LLVMBuilderRef
     {
         $ffiStructure = $this->ffi->LLVMCreateBuilder();
 
-        return LLVMBuilderRef::marshal($ffiStructure);
+        return $this->wrap(LLVMBuilderRef::class, $ffiStructure);
     }
 
     public function LLVMAppendBasicBlock(LLVMValueRef $function, string $name) : LLVMBasicBlockRef
     {
         $ffiStructure = $this->ffi->LLVMAppendBasicBlock($function->demarshal(), $name);
 
-        return LLVMBasicBlockRef::marshal($ffiStructure);
+        return $this->wrap(LLVMBasicBlockRef::class, $ffiStructure);
     }
 
     public function LLVMPositionBuilderAtEnd(LLVMBuilderRef $builder, LLVMBasicBlockRef $block) : void
