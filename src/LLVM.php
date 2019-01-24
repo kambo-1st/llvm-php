@@ -44,12 +44,12 @@ class LLVM
         bool $isVarArg
     ) : LLVMTypeRef {
         // TODO sanity check
-        // TODO use instead static function FFI::arrayType(FFI\CType $type, array $dims): FFI\CType
-        $paramTypesFfi = $this->ffi->new("LLVMTypeRef param_types[".$paramCount."]");
+        $paramTypesFfi = $this->createArray('LLVMTypeRef', $paramCount);
 
+        $index = 0;
         foreach ($paramTypes as $pos => $paramType) {
-            // Index must be provided
-            $paramTypesFfi[$pos]  = $paramType->demarshal();
+            $paramTypesFfi[$index]  = $paramType->demarshal();
+            $index++;
         }
 
         $ffiStructure = $this->ffi->LLVMFunctionType($returnType->demarshal(), $paramTypesFfi, $paramCount, $isVarArg);
@@ -166,7 +166,7 @@ class LLVM
 
     public function LLVMRunFunction($executionEngine, $function, $numArgs, $args) : LLVMGenericValueRef
     {
-        $inputValues = $this->ffi->new("LLVMGenericValueRef args[".$numArgs."]");
+        $inputValues = $this->createArray('LLVMGenericValueRef', $numArgs);
 
         foreach ($args as $pos => $paramType) {
             // Index must be provided
@@ -196,5 +196,12 @@ class LLVM
     private function unwrap(Marshable $item)
     {
         return $item->demarshal($this->ffi);
+    }
+
+    private function createArray(string $type, int $size)
+    {
+        $arrayType       = $this->ffi->type($type);
+        $arrayDefinition = $this->ffi::arrayType($arrayType, [$size]);
+        return $this->ffi->new($arrayDefinition);
     }
 }
