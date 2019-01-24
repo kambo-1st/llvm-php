@@ -44,13 +44,7 @@ class LLVM
         bool $isVarArg
     ) : LLVMTypeRef {
         // TODO sanity check
-        $paramTypesFfi = $this->createArray('LLVMTypeRef', $paramCount);
-
-        $index = 0;
-        foreach ($paramTypes as $pos => $paramType) {
-            $paramTypesFfi[$index]  = $paramType->demarshal();
-            $index++;
-        }
+        $paramTypesFfi = $this->createArray('LLVMTypeRef', $paramCount, $paramTypes);
 
         $ffiStructure = $this->ffi->LLVMFunctionType($returnType->demarshal(), $paramTypesFfi, $paramCount, $isVarArg);
 
@@ -166,12 +160,7 @@ class LLVM
 
     public function LLVMRunFunction($executionEngine, $function, $numArgs, $args) : LLVMGenericValueRef
     {
-        $inputValues = $this->createArray('LLVMGenericValueRef', $numArgs);
-
-        foreach ($args as $pos => $paramType) {
-            // Index must be provided
-            $inputValues[$pos]  = $paramType->demarshal();
-        }
+        $inputValues = $this->createArray('LLVMGenericValueRef', $numArgs, $args);
 
         $ffiStructure = $this->ffi->LLVMRunFunction(
             $this->unwrap($executionEngine),
@@ -198,10 +187,18 @@ class LLVM
         return $item->demarshal($this->ffi);
     }
 
-    private function createArray(string $type, int $size)
+    private function createArray(string $type, int $size, $items=[])
     {
         $arrayType       = $this->ffi->type($type);
         $arrayDefinition = $this->ffi::arrayType($arrayType, [$size]);
-        return $this->ffi->new($arrayDefinition);
+        $array           = $this->ffi->new($arrayDefinition);
+
+        $index = 0;
+        foreach ($items as $item) {
+            $array[$index] = $item->demarshal();
+            $index++;
+        }
+
+        return $array;
     }
 }
