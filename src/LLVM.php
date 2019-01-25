@@ -11,6 +11,7 @@ use Kambo\LLVM\Types\LLVMModuleRef;
 use Kambo\LLVM\Types\LLVMTypeRef;
 use Kambo\LLVM\Types\LLVMValueRef;
 use Kambo\LLVM\Types\Marshable;
+use Kambo\LLVM\Assert\Assertion;
 
 /**
  * Simple wrapper around LLVM c api
@@ -33,7 +34,8 @@ class LLVM
     public function LLVMModuleCreateWithName(string $moduleName) : LLVMModuleRef
     {
         $ffiStructure = $this->ffi->LLVMModuleCreateWithName($moduleName);
-        return LLVMModuleRef::marshal($ffiStructure);
+
+        return $this->wrap(LLVMModuleRef::class, $ffiStructure);
     }
 
     public function LLVMFunctionType(
@@ -42,46 +44,50 @@ class LLVM
         int $paramCount,
         bool $isVarArg
     ) : LLVMTypeRef {
-        // TODO sanity check
-        // TODO use instead static function FFI::arrayType(FFI\CType $type, array $dims): FFI\CType
-        $paramTypesFfi = $this->ffi->new("LLVMTypeRef param_types[".$paramCount."]");
+        Assertion::allIsInstanceOf(
+            $paramTypes,
+            LLVMTypeRef::class,
+            'All provided parameters must be instances of '.LLVMTypeRef::class
+        );
+        Assertion::count(
+            $paramTypes,
+            $paramCount,
+            'Number of the provided parameters must be same as their count.'
+        );
 
-        foreach ($paramTypes as $pos => $paramType) {
-            // Index must be provided
-            $paramTypesFfi[$pos]  = $paramType->demarshal();
-        }
+        $paramTypesFfi = $this->createArray('LLVMTypeRef', $paramCount, $paramTypes);
 
         $ffiStructure = $this->ffi->LLVMFunctionType($returnType->demarshal(), $paramTypesFfi, $paramCount, $isVarArg);
 
-        return LLVMTypeRef::marshal($ffiStructure);
+        return $this->wrap(LLVMTypeRef::class, $ffiStructure);
     }
 
     public function LLVMInt32Type() : LLVMTypeRef
     {
         $ffiStructure = $this->ffi->LLVMInt32Type();
 
-        return LLVMTypeRef::marshal($ffiStructure);
+        return $this->wrap(LLVMTypeRef::class, $ffiStructure);
     }
 
     public function LLVMAddFunction(LLVMModuleRef $module, string $name, LLVMTypeRef $functionType) : LLVMValueRef
     {
         $ffiStructure = $this->ffi->LLVMAddFunction($module->demarshal(), $name, $functionType->demarshal());
 
-        return LLVMValueRef::marshal($ffiStructure);
+        return $this->wrap(LLVMValueRef::class, $ffiStructure);
     }
 
     public function LLVMCreateBuilder() : LLVMBuilderRef
     {
         $ffiStructure = $this->ffi->LLVMCreateBuilder();
 
-        return LLVMBuilderRef::marshal($ffiStructure);
+        return $this->wrap(LLVMBuilderRef::class, $ffiStructure);
     }
 
     public function LLVMAppendBasicBlock(LLVMValueRef $function, string $name) : LLVMBasicBlockRef
     {
         $ffiStructure = $this->ffi->LLVMAppendBasicBlock($function->demarshal(), $name);
 
-        return LLVMBasicBlockRef::marshal($ffiStructure);
+        return $this->wrap(LLVMBasicBlockRef::class, $ffiStructure);
     }
 
     public function LLVMPositionBuilderAtEnd(LLVMBuilderRef $builder, LLVMBasicBlockRef $block) : void
@@ -165,12 +171,10 @@ class LLVM
 
     public function LLVMRunFunction($executionEngine, $function, $numArgs, $args) : LLVMGenericValueRef
     {
-        $inputValues = $this->ffi->new("LLVMGenericValueRef args[".$numArgs."]");
+        //Assertion::allIsInstanceOf($args, LLVMValueRef::class); segfaulting on PHP master, dunno why...
+        Assertion::count($args, $numArgs);
 
-        foreach ($args as $pos => $paramType) {
-            // Index must be provided
-            $inputValues[$pos]  = $paramType->demarshal();
-        }
+        $inputValues = $this->createArray('LLVMGenericValueRef', $numArgs, $args);
 
         $ffiStructure = $this->ffi->LLVMRunFunction(
             $this->unwrap($executionEngine),
@@ -195,5 +199,20 @@ class LLVM
     private function unwrap(Marshable $item)
     {
         return $item->demarshal($this->ffi);
+    }
+
+    private function createArray(string $type, int $size, array $items = [])
+    {
+        $arrayType       = $this->ffi->type($type);
+        $arrayDefinition = $this->ffi::arrayType($arrayType, [$size]);
+        $array           = $this->ffi->new($arrayDefinition);
+
+        $index = 0;
+        foreach ($items as $item) {
+            $array[$index] = $item->demarshal();
+            $index++;
+        }
+
+        return $array;
     }
 }

@@ -12,7 +12,8 @@
   ],
   "require": {
     "php": ">=7.3",
-    "ext-ffi": "*"
+    "ext-ffi": "*",
+    "beberlei/assert" : "3.*"
   },
   "require-dev": {
     "phpunit/phpunit": "7.*",
