@@ -11,6 +11,7 @@ use Kambo\LLVM\Types\LLVMModuleRef;
 use Kambo\LLVM\Types\LLVMTypeRef;
 use Kambo\LLVM\Types\LLVMValueRef;
 use Kambo\LLVM\Types\Marshable;
+use Kambo\LLVM\Assert\Assertion;
 
 /**
  * Simple wrapper around LLVM c api
@@ -43,7 +44,17 @@ class LLVM
         int $paramCount,
         bool $isVarArg
     ) : LLVMTypeRef {
-        // TODO sanity check
+        Assertion::allIsInstanceOf(
+            $paramTypes,
+            LLVMTypeRef::class,
+            'All provided parameters must be instances of '.LLVMTypeRef::class
+        );
+        Assertion::count(
+            $paramTypes,
+            $paramCount,
+            'Number of the provided parameters must be same as their count.'
+        );
+
         $paramTypesFfi = $this->createArray('LLVMTypeRef', $paramCount, $paramTypes);
 
         $ffiStructure = $this->ffi->LLVMFunctionType($returnType->demarshal(), $paramTypesFfi, $paramCount, $isVarArg);
@@ -160,6 +171,9 @@ class LLVM
 
     public function LLVMRunFunction($executionEngine, $function, $numArgs, $args) : LLVMGenericValueRef
     {
+        //Assertion::allIsInstanceOf($args, LLVMValueRef::class); segfaulting on PHP master, dunno why...
+        Assertion::count($args, $numArgs);
+
         $inputValues = $this->createArray('LLVMGenericValueRef', $numArgs, $args);
 
         $ffiStructure = $this->ffi->LLVMRunFunction(
@@ -187,7 +201,7 @@ class LLVM
         return $item->demarshal($this->ffi);
     }
 
-    private function createArray(string $type, int $size, $items=[])
+    private function createArray(string $type, int $size, array $items = [])
     {
         $arrayType       = $this->ffi->type($type);
         $arrayDefinition = $this->ffi::arrayType($arrayType, [$size]);

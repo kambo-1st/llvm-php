@@ -3,9 +3,12 @@
 namespace Kambo\Tests\LLVM\Integration;
 
 use PHPUnit\Framework\TestCase;
+
 use Kambo\LLVM\LLVM;
 use Kambo\LLVM\Types\LLVMExecutionEngineRef;
 use Kambo\LLVM\Types\LLVMModuleRef;
+
+use Kambo\LLVM\Assert\InvalidArgumentException;
 
 /**
  * Integration tests for class Kambo\LLVM\LLVM
@@ -68,6 +71,25 @@ EOT;
         $convertedResult = $llvm->LLVMGenericValueToInt($result, false);
 
         $this->assertEquals(27, $convertedResult);
+    }
+
+    /**
+     * Tests providing invalid parameters count to the method LLVMFunctionType
+     *
+     * @return void
+     */
+    public function testInvalidParamCount() : void
+    {
+        $llvm       = new LLVM();
+        $paramTypes = [
+            $llvm->LLVMInt32Type(),
+            $llvm->LLVMInt32Type()
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Number of the provided parameters must be same as their count.');
+
+        $llvm->LLVMFunctionType($llvm->LLVMInt32Type(), $paramTypes, 5, 0);
     }
 
     /**
