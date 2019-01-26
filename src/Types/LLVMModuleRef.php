@@ -3,7 +3,9 @@
 namespace Kambo\LLVM\Types;
 
 /**
- * The top-level container for all other LLVM Intermediate Representation (IR)
+ * An LLVM module is effectively a translation unit or a collection of translation units merged together.
+ *
+ * It's also top-level container for all other LLVM Intermediate Representation (IR)
  * objects.
  *
  * @author  Bohuslav Simek <bohuslav@simek.si>
