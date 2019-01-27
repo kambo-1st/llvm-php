@@ -240,8 +240,6 @@ class LLVM
      */
     public function LLVMLinkInInterpreter() : void
     {
-        // TODO completely remove this call as this does not make any sense.
-        $this->ffi->LLVMLinkInInterpreter();
     }
 
     /**
