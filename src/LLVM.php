@@ -270,14 +270,13 @@ class LLVM
      * @param LLVMModuleRef $module Module from which the function will be gotten
      * @param string        $name   Function name
      *
-     * @return LLVMValueRef Function
+     * @return LLVMValueRef|null Found function or null, if nothing is found
      */
-    public function LLVMGetNamedFunction(LLVMModuleRef $module, string $name) : LLVMValueRef
+    public function LLVMGetNamedFunction(LLVMModuleRef $module, string $name) : ?LLVMValueRef
     {
         $ffiStructure = $this->ffi->LLVMGetNamedFunction($this->unwrap($module), $name);
 
-        // TODO Null pointer will be returned, if there is no such function, inspect this behaviour
-        return $this->wrap(LLVMValueRef::class, $ffiStructure);
+        return ($ffiStructure === null) ? null : $this->wrap(LLVMValueRef::class, $ffiStructure);
     }
 
     /**
