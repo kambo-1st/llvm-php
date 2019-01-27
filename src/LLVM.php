@@ -251,16 +251,19 @@ class LLVM
      * @param LLVMModuleRef          $module    Module for which the interpreter will be created
      * @param string                 $outError  Error message
      *
-     * @return void
+     * @return bool True if the creation
      */
-    public function LLVMCreateInterpreterForModule(LLVMExecutionEngineRef $outInterp, LLVMModuleRef $module, $outError)
-    {
+    public function LLVMCreateInterpreterForModule(
+        LLVMExecutionEngineRef $outInterp,
+        LLVMModuleRef $module,
+        ?string &$outError
+    ) : bool {
         $unWrap = $this->unwrap($outInterp);
 
         $enginePointer = FFI::addr($unWrap);
+        $ffiStructure  = $this->ffi->LLVMCreateInterpreterForModule($enginePointer, $this->unwrap($module), $outError);
 
-        // TODO this should return LLVMBool
-        $this->ffi->LLVMCreateInterpreterForModule($enginePointer, $this->unwrap($module), $outError);
+        return (bool)$ffiStructure;
     }
 
     /**
