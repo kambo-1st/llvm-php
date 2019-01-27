@@ -93,6 +93,27 @@ EOT;
     }
 
     /**
+     * Tests getting non existing function
+     *
+     * @return void
+     */
+    public function testLLVMGetNamedFunctionNonExistingFunction() : void
+    {
+        $llvm   = new LLVM();
+        $module = $this->getTestedModule($llvm);
+
+        $llvm->LLVMLinkInInterpreter();
+        $executionEngine = new LLVMExecutionEngineRef();
+
+        $error = null;
+        $llvm->LLVMCreateInterpreterForModule($executionEngine, $module, $error);
+
+        $namedFunction = $llvm->LLVMGetNamedFunction($module, 'non existing function');
+
+        $this->assertNull($namedFunction);
+    }
+
+    /**
      * Generate LLVM equivalent of:
      *
      * int sum(int a, int b) {

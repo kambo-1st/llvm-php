@@ -79,7 +79,12 @@ class LLVM
 
         $paramTypesFfi = $this->createArray('LLVMTypeRef', $paramCount, $paramTypes);
 
-        $ffiStructure = $this->ffi->LLVMFunctionType($returnType->demarshal(), $paramTypesFfi, $paramCount, $isVarArg);
+        $ffiStructure = $this->ffi->LLVMFunctionType(
+            $this->unwrap($returnType),
+            $paramTypesFfi,
+            $paramCount,
+            $isVarArg
+        );
 
         return $this->wrap(LLVMTypeRef::class, $ffiStructure);
     }
@@ -107,7 +112,11 @@ class LLVM
      */
     public function LLVMAddFunction(LLVMModuleRef $module, string $name, LLVMTypeRef $functionType) : LLVMValueRef
     {
-        $ffiStructure = $this->ffi->LLVMAddFunction($module->demarshal(), $name, $functionType->demarshal());
+        $ffiStructure = $this->ffi->LLVMAddFunction(
+            $this->unwrap($module),
+            $name,
+            $this->unwrap($functionType)
+        );
 
         return $this->wrap(LLVMValueRef::class, $ffiStructure);
     }
@@ -134,7 +143,7 @@ class LLVM
      */
     public function LLVMAppendBasicBlock(LLVMValueRef $function, string $name) : LLVMBasicBlockRef
     {
-        $ffiStructure = $this->ffi->LLVMAppendBasicBlock($function->demarshal(), $name);
+        $ffiStructure = $this->ffi->LLVMAppendBasicBlock($this->unwrap($function), $name);
 
         return $this->wrap(LLVMBasicBlockRef::class, $ffiStructure);
     }
@@ -240,8 +249,6 @@ class LLVM
      */
     public function LLVMLinkInInterpreter() : void
     {
-        // TODO completely remove this call as this does not make any sense.
-        $this->ffi->LLVMLinkInInterpreter();
     }
 
     /**
@@ -251,16 +258,19 @@ class LLVM
      * @param LLVMModuleRef          $module    Module for which the interpreter will be created
      * @param string                 $outError  Error message
      *
-     * @return void
+     * @return bool True if the creation
      */
-    public function LLVMCreateInterpreterForModule(LLVMExecutionEngineRef $outInterp, LLVMModuleRef $module, $outError)
-    {
+    public function LLVMCreateInterpreterForModule(
+        LLVMExecutionEngineRef $outInterp,
+        LLVMModuleRef $module,
+        ?string &$outError
+    ) : bool {
         $unWrap = $this->unwrap($outInterp);
 
         $enginePointer = FFI::addr($unWrap);
+        $ffiStructure  = $this->ffi->LLVMCreateInterpreterForModule($enginePointer, $this->unwrap($module), $outError);
 
-        // TODO this should return LLVMBool
-        $this->ffi->LLVMCreateInterpreterForModule($enginePointer, $this->unwrap($module), $outError);
+        return (bool)$ffiStructure;
     }
 
     /**
@@ -269,14 +279,13 @@ class LLVM
      * @param LLVMModuleRef $module Module from which the function will be gotten
      * @param string        $name   Function name
      *
-     * @return LLVMValueRef Function
+     * @return LLVMValueRef|null Found function or null, if nothing is found
      */
-    public function LLVMGetNamedFunction(LLVMModuleRef $module, string $name) : LLVMValueRef
+    public function LLVMGetNamedFunction(LLVMModuleRef $module, string $name) : ?LLVMValueRef
     {
         $ffiStructure = $this->ffi->LLVMGetNamedFunction($this->unwrap($module), $name);
 
-        // TODO Null pointer will be returned, if there is no such function, inspect this behaviour
-        return $this->wrap(LLVMValueRef::class, $ffiStructure);
+        return ($ffiStructure === null) ? null : $this->wrap(LLVMValueRef::class, $ffiStructure);
     }
 
     /**
