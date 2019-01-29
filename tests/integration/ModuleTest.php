@@ -5,8 +5,10 @@ namespace Kambo\Tests\LLVM\Integration;
 use PHPUnit\Framework\TestCase;
 
 use Kambo\LLVM\LLVM;
+
 use Kambo\LLVM\Types\LLVMExecutionEngineRef;
 use Kambo\LLVM\Types\LLVMModuleRef;
+use Kambo\LLVM\Types\LLVMVerifierFailureAction;
 
 use Kambo\LLVM\Assert\InvalidArgumentException;
 
@@ -71,6 +73,96 @@ EOT;
         $convertedResult = $llvm->LLVMGenericValueToInt($result, false);
 
         $this->assertEquals(27, $convertedResult);
+    }
+
+    /**
+     * Tests verifying module, module is valid
+     *
+     * @return void
+     */
+    public function testLLVMVerifyModule() : void
+    {
+        $llvm   = new LLVM();
+        $module = $this->getTestedModule($llvm);
+
+        $error  = null;
+        $result = $llvm->LLVMVerifyModule($module, LLVMVerifierFailureAction::LLVMReturnStatusAction(), $error);
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Tests verifying module, module is invalid
+     *
+     * @return void
+     */
+    public function testLLVMVerifyModuleInvalid() : void
+    {
+        $llvm   = new LLVM();
+        $module = $llvm->LLVMModuleCreateWithName("my_module");
+
+        $paramTypes = [
+            $llvm->LLVMInt32Type(),
+            $llvm->LLVMInt32Type()
+        ];
+
+        $retType  = $llvm->LLVMFunctionType($llvm->LLVMInt32Type(), $paramTypes, 2, 0);
+
+        $sum   = $llvm->LLVMAddFunction($module, 'sum', $retType);
+        $entry = $llvm->LLVMAppendBasicBlock($sum, 'entry');
+
+        $builder = $llvm->LLVMCreateBuilder();
+        $llvm->LLVMPositionBuilderAtEnd($builder, $entry);
+
+        $error  = null;
+        $result = $llvm->LLVMVerifyModule($module, LLVMVerifierFailureAction::LLVMReturnStatusAction(), $error);
+
+        $this->assertTrue($result);
+        $this->assertEquals("Basic Block in function 'sum' does not have terminator!\nlabel %entry\n", $error);
+    }
+
+    /**
+     * Tests verifying function, function is valid.
+     *
+     * @return void
+     */
+    public function testLLVMVerifyFunction() : void
+    {
+        $llvm   = new LLVM();
+        $module = $this->getTestedModule($llvm);
+
+        $function = $llvm->LLVMGetNamedFunction($module, 'sum');
+        $result   = $llvm->LLVMVerifyFunction($function, LLVMVerifierFailureAction::LLVMReturnStatusAction());
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Tests verifying function, function is invalid.
+     *
+     * @return void
+     */
+    public function testLLVMVerifyFunctionInvalid() : void
+    {
+        $llvm   = new LLVM();
+        $module = $llvm->LLVMModuleCreateWithName("my_module");
+
+        $paramTypes = [
+            $llvm->LLVMInt32Type(),
+            $llvm->LLVMInt32Type()
+        ];
+
+        $retType  = $llvm->LLVMFunctionType($llvm->LLVMInt32Type(), $paramTypes, 2, 0);
+
+        $sum   = $llvm->LLVMAddFunction($module, 'sum', $retType);
+        $entry = $llvm->LLVMAppendBasicBlock($sum, 'entry');
+
+        $builder = $llvm->LLVMCreateBuilder();
+        $llvm->LLVMPositionBuilderAtEnd($builder, $entry);
+
+        $result = $llvm->LLVMVerifyFunction($sum, LLVMVerifierFailureAction::LLVMReturnStatusAction());
+
+        $this->assertTrue($result);
     }
 
     /**

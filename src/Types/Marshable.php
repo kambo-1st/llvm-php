@@ -24,7 +24,7 @@ interface Marshable
     /**
      * Demarshal data into php FFI format
      *
-     * @return FFI\CData
+     * @return mixed
      */
-    public function demarshal() : CData;
+    public function demarshal();
 }
