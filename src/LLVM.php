@@ -281,7 +281,7 @@ class LLVM
      * @param LLVMModuleRef $module Module from which the function will be gotten
      * @param string        $name   Function name
      *
-     * @return LLVMValueRef|null Found function or null, if nothing is found
+     * @return LLVMValueRef|null Reference to found function or null, if nothing is found
      */
     public function LLVMGetNamedFunction(LLVMModuleRef $module, string $name) : ?LLVMValueRef
     {
@@ -373,6 +373,32 @@ class LLVM
 
         $outMessage = FFI::string($error[0]);
         return (bool)$ffiStructure;
+    }
+
+    /**
+     * Open up a ghostview window that displays the CFG of the current function.
+     * Useful for debugging.
+     *
+     * @param LLVMValueRef $fn Reference to function
+     *
+     * @return void
+     */
+    public function LLVMViewFunctionCFG(LLVMValueRef $fn) : void
+    {
+        $this->ffi->LLVMViewFunctionCFG($this->unwrap($fn));
+    }
+
+    /**
+     * It works just like viewCFG, but it does not include the contents of basic blocks
+     * into the nodes, just the label. If you are only interested in the CFG this can make the graph smaller.
+     *
+     * @param LLVMValueRef $fn Reference to function
+     *
+     * @return void
+     */
+    public function LLVMViewFunctionCFGOnly(LLVMValueRef $fn) : void
+    {
+        $this->ffi->LLVMViewFunctionCFGOnly($this->unwrap($fn));
     }
 
     private function wrap(string $type, $item) : Marshable
