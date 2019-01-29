@@ -10,6 +10,7 @@ use Kambo\LLVM\Types\LLVMGenericValueRef;
 use Kambo\LLVM\Types\LLVMModuleRef;
 use Kambo\LLVM\Types\LLVMTypeRef;
 use Kambo\LLVM\Types\LLVMValueRef;
+use Kambo\LLVM\Types\LLVMVerifierFailureAction;
 use Kambo\LLVM\Types\Marshable;
 use Kambo\LLVM\Assert\Assertion;
 
@@ -267,6 +268,7 @@ class LLVM
     ) : bool {
         $unWrap = $this->unwrap($outInterp);
 
+        // TODO probably leaking memory
         $enginePointer = FFI::addr($unWrap);
         $ffiStructure  = $this->ffi->LLVMCreateInterpreterForModule($enginePointer, $this->unwrap($module), $outError);
 
@@ -342,6 +344,35 @@ class LLVM
     public function LLVMGenericValueToInt(LLVMGenericValueRef $genValRef, bool $isSigned) : int
     {
         return $this->ffi->LLVMGenericValueToInt($this->unwrap($genValRef), $isSigned);
+    }
+
+    /**
+     * Verifies that a module is valid, taking the specified action if not.
+     * Optionally returns a human-readable description of any invalid constructs.
+     *
+     * @param LLVMModuleRef             $module     Module which will be verified.
+     * @param LLVMVerifierFailureAction $action     Define action which will be taken module is not valid.
+     * @param string                    $outMessage Reference to string which will contain a human-readable
+     *                                              description of any invalid constructs.
+     *
+     * @return bool If there are no errors, the function returns false. If an error is found,
+     *              a message describing the error is written to OS (if non-null) and true is returned.
+     */
+    public function LLVMVerifyModule(
+        LLVMModuleRef $module,
+        LLVMVerifierFailureAction $action,
+        ?string &$outMessage
+    ) : bool {
+        $error = $this->ffi->new("char *error[1]");
+
+        $ffiStructure = $this->ffi->LLVMVerifyModule(
+            $this->unwrap($module),
+            $this->unwrap($action),
+            $error
+        );
+
+        $outMessage = FFI::string($error[0]);
+        return (bool)$ffiStructure;
     }
 
     private function wrap(string $type, $item) : Marshable
