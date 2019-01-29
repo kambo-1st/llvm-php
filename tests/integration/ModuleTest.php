@@ -122,6 +122,50 @@ EOT;
     }
 
     /**
+     * Tests verifying function, function is valid.
+     *
+     * @return void
+     */
+    public function testLLVMVerifyFunction() : void
+    {
+        $llvm   = new LLVM();
+        $module = $this->getTestedModule($llvm);
+
+        $function = $llvm->LLVMGetNamedFunction($module, 'sum');
+        $result   = $llvm->LLVMVerifyFunction($function, LLVMVerifierFailureAction::LLVMReturnStatusAction());
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * Tests verifying function, function is invalid.
+     *
+     * @return void
+     */
+    public function testLLVMVerifyFunctionInvalid() : void
+    {
+        $llvm   = new LLVM();
+        $module = $llvm->LLVMModuleCreateWithName("my_module");
+
+        $paramTypes = [
+            $llvm->LLVMInt32Type(),
+            $llvm->LLVMInt32Type()
+        ];
+
+        $retType  = $llvm->LLVMFunctionType($llvm->LLVMInt32Type(), $paramTypes, 2, 0);
+
+        $sum   = $llvm->LLVMAddFunction($module, 'sum', $retType);
+        $entry = $llvm->LLVMAppendBasicBlock($sum, 'entry');
+
+        $builder = $llvm->LLVMCreateBuilder();
+        $llvm->LLVMPositionBuilderAtEnd($builder, $entry);
+
+        $result = $llvm->LLVMVerifyFunction($sum, LLVMVerifierFailureAction::LLVMReturnStatusAction());
+
+        $this->assertTrue($result);
+    }
+
+    /**
      * Tests providing invalid parameters count to the method LLVMFunctionType
      *
      * @return void

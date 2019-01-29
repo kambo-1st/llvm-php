@@ -376,6 +376,28 @@ class LLVM
     }
 
     /**
+     * Verifies that a single function is valid, taking the specified action. Useful
+     * for debugging.
+     *
+     * @param LLVMValueRef              $fn     Function which will be verified.
+     * @param LLVMVerifierFailureAction $action Define action which will be taken module is not valid.
+     *
+     * @return bool If there are no errors, the function returns false. If an error is found,
+     *              a message describing the error is written to OS (if non-null) and true is returned.
+     */
+    public function LLVMVerifyFunction(
+        LLVMValueRef $fn,
+        LLVMVerifierFailureAction $action
+    ) : bool {
+        $ffiStructure = $this->ffi->LLVMVerifyFunction(
+            $this->unwrap($fn),
+            $this->unwrap($action)
+        );
+
+        return (bool)$ffiStructure;
+    }
+
+    /**
      * Open up a ghostview window that displays the CFG of the current function.
      * Useful for debugging.
      *
